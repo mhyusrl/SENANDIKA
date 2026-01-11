@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>HOME</title>
+    <link rel="canonical" href="https://antologi.fadli.asia/Senandika/">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .team-container {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+            margin-top: 30px;
+        }
+        .team-card {
+            background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+            backdrop-filter: blur(8px);
+            padding: 18px;
+            border-radius: 16px;
+            width: 260px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.06);
+            transition: transform 0.35s ease, box-shadow 0.35s ease;
+        }
+        .team-card:hover { transform: translateY(-10px); box-shadow: 0 30px 60px rgba(0,0,0,0.35); }
+        .team-card img {
+            width: 128px;
+            height: 128px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 12px;
+            border: 4px solid rgba(255,215,0,0.95);
+        }
+        .team-card .name { margin: 6px 0 4px 0; color: #ffd700; font-weight:700; }
+        .team-card .role { margin: 0; color: rgba(255,255,255,0.9); font-weight:600; }
+        .team-card .nim { margin: 8px 0 0 0; font-size: 0.9em; color: rgba(255,255,255,0.85); }
+        
+        .cta-button {
+            margin-top: 40px;
+            display: inline-block;
+        }
+        footer {
+            text-align: center;
+            padding: 10px;
+            color: rgba(255,255,255,0.9);
+        }
+    </style>
+</head>
+<body>
+    <button id="theme-toggle" class="toggle">🌙</button>
+    <header>
+        <div class="brand">
+            <img src="logo.png" alt="Logo" class="logo">
+            <h1>SENANDIKA</h1>
+        </div>
+        <nav>
+            <form id="site-search" style="display:inline-block; margin-right:12px;">
+                <input id="search-input" type="search" placeholder="Cari produk..." aria-label="Cari produk" style="padding:8px 10px; border-radius:8px; border:1px solid rgba(255,255,255,0.06);">
+                <button type="submit" style="padding:8px 10px; border-radius:8px;">🔍</button>
+            </form>
+            <a href="login.html">Login</a> | <a href="register.html">Register</a>
+            <a href="contact.html" class="button contact-btn" style="margin-left:12px;">Contact Us</a>
+        </nav>
+    </header>
+    <div class="section">
+        <div class="welcome hero">
+            <div class="hero-inner">
+                <h2>Selamat Datang di COMPARING LAPTOPS — Temukan Laptop Terbaikmu!</h2>
+                <p>Cari, bandingkan, dan pilih laptop yang paling cocok untuk kebutuhanmu.</p>
+                <div class="hero-cta">
+                    <a href="compare.html" class="button">Mulai Bandingkan Sekarang</a>
+                </div>
+            </div>
+        </div>
+        <div class="card about-card">
+            <div class="about-content">
+                <h2>Tentang Comparing Laptops</h2>
+                <div class="about-flex">
+                    <div class="about-text" style="max-width:900px;">
+                        <p>Platform Perbandingan Laptop ini dirancang untuk mendukung perwujudan Sustainable Development Goals (SDGs), khususnya pada pilar Pendidikan Berkualitas (SDG 4) dan Konsumsi yang Bertanggung Jawab (SDG 12). Melalui penyediaan informasi spesifikasi yang transparan dan objektif, kami membantu pelajar serta pendidik menemukan perangkat teknologi yang tepat untuk menunjang efektivitas belajar di era digital, sekaligus mengedukasi masyarakat untuk menjadi konsumen yang cerdas dengan memilih produk yang memiliki daya tahan lama dan nilai guna tinggi guna mengurangi limbah elektronik. Kehadiran platform ini memitigasi risiko kesalahan investasi teknologi dengan memastikan setiap individu mendapatkan perangkat yang paling sesuai dengan kebutuhan produktivitas mereka, sehingga website ini bukan sekadar alat bantu belanja, melainkan bukti nyata dedikasi pengembang dalam menciptakan ekosistem informasi yang edukatif, efisien, inklusif, dan berkelanjutan bagi masa depan generasi bangsa.</p>
+                        <h3 class="subhead">SDGs Terkait</h3>
+                        <div class="sdg-grid">
+                    <div class="sdg-item">
+                        <div class="sdg-badge" aria-hidden="true"><span>4</span></div>
+                        <div class="sdg-text">
+                            <h4>SDG 4 — Pendidikan Berkualitas</h4>
+                            <p>Platform ini menyajikan perbandingan spesifikasi dan rekomendasi yang membantu pelajar, guru, dan institusi memilih perangkat yang sesuai untuk pembelajaran. Dengan informasi yang mudah diakses tentang performa, ketahanan baterai, dan nilai pendidikan, pengguna dapat membuat keputusan yang mendukung proses pembelajaran berkualitas, inklusif, dan berkesinambungan.</p>
+                        </div>
+                    </div>
+                    <div class="sdg-item">
+                        <div class="sdg-badge sdg-12" aria-hidden="true"><span>12</span></div>
+                        <div class="sdg-text">
+                            <h4>SDG 12 — Konsumsi & Produksi Bertanggung Jawab</h4>
+                            <p>Kami mendorong praktik konsumsi yang bijak dengan menampilkan informasi tentang daya tahan, garansi, dan efisiensi perangkat. Dengan memilih laptop yang tepat dan tahan lama, pengguna dapat mengurangi frekuensi penggantian perangkat dan menurunkan jumlah sampah elektronik, sehingga berkontribusi pada produksi dan konsumsi yang lebih bertanggung jawab.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Top 10 Laptop Teratas</h2>
+        <div id="top10" class="grid"></div>
+    </div>
+
+    <div class="section">
+        <h2>Rekomendasi Untukmu</h2>
+        <div id="recommended" class="grid"></div>
+    </div>
+
+    <div class="section">
+        <h2>Tambah Produk (Admin / Demo)</h2>
+        <div style="max-width:900px;margin:0 auto;padding:12px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:12px;">
+            <button id="toggle-add-product" class="button">Tambah Produk Baru</button>
+            <form id="add-product-form" style="display:none;margin-top:12px;text-align:left;">
+                <div style="display:flex;gap:12px;flex-wrap:wrap;">
+                    <div style="flex:1;min-width:200px;"><label>Judul</label><input id="ap-title" type="text" placeholder="Nama produk"></div>
+                    <div style="flex:1;min-width:200px;"><label>CPU</label><input id="ap-cpu" type="text" placeholder="contoh: Intel i5"></div>
+                    <div style="flex:1;min-width:200px;"><label>RAM</label><input id="ap-ram" type="text" placeholder="contoh: 8GB"></div>
+                </div>
+                <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:8px;">
+                    <div style="flex:1;min-width:200px;"><label>Storage</label><input id="ap-storage" type="text" placeholder="contoh: 512GB SSD"></div>
+                    <div style="flex:1;min-width:200px;"><label>Harga (angka saja)</label><input id="ap-price" type="number" placeholder="contoh: 8000000"></div>
+                    <div style="flex:1;min-width:200px;"><label>Skor (0-100)</label><input id="ap-score" type="number" placeholder="contoh: 85"></div>
+                </div>
+                <div style="margin-top:8px;">
+                    <label>URL Gambar (opsional)</label>
+                    <input id="ap-image" type="text" placeholder="https://...">
+                </div>
+                <div style="text-align:right;margin-top:10px;">
+                    <button id="ap-submit" class="button">Simpan Produk</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Terbaru</h2>
+        <div id="latest" class="grid"></div>
+    </div>
+
+    <div class="section">
+        <h2>Favorit Anda</h2>
+        <div id="favorites" class="grid"></div>
+    </div>
+
+    <div class="section">
+        <h2>TIM PENGEMBANGAN</h2>
+        <div class="team-container">
+             <div class="team-card">
+                <img src="YUSRIL.jpeg" alt="Foto Yusril">
+                <h4 class="name">YUSRIL</h4>
+                <p class="role">THE HIPSTER</p>
+                <p class="nim">NIM : 202431130</p>
+            </div>
+            <div class="team-card">
+                <img src="SALWA.jpeg" alt="Foto Salwa">
+                <h4 class="name">SALWA AZZAHRA R.</h4>
+                <p class="role">THE HUSTLER</p>
+                <p class="nim">NIM : 202431079</p>
+            </div>
+            <div class="team-card">
+                <img src="ALAM.jpeg" alt="Foto Alam">
+                <h4 class="name">NURALAM FAJAR A.</h4>
+                <p class="role">THE HUSTLER</p>
+                <p class="nim">NIM : 202431139</p>
+            </div>
+            <div class="team-card">
+                <img src="SYAGITA.jpeg" alt="Foto Syagita">
+                <h4 class="name">SYAGITA MAHARANI PH.</h4>
+                <p class="role">ANGGOTA</p>
+                <p class="nim">NIM : 202431080</p>
+            </div>
+        </div>
+        <div class="cta-button">
+            <a href="register.html" class="button">Register Now</a>
+        </div>
+    <footer>
+    <p>&copy; 2026 TIM SENANDIKA : <a href="https://itpln.ac.id/" target="_blank" rel="noopener">ITPLN</a></p>
+    </footer>
+    <script src="scripts.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', ()=>{
+            const toggle = document.getElementById('toggle-add-product');
+            const form = document.getElementById('add-product-form');
+            const submit = document.getElementById('ap-submit');
+            if (toggle && form) toggle.addEventListener('click', ()=>{ form.style.display = form.style.display === 'none' || form.style.display === '' ? 'block' : 'none'; });
+            if (submit) {
+                submit.addEventListener('click', (e)=>{
+                    e.preventDefault();
+                    const data = {
+                        title: document.getElementById('ap-title').value.trim(),
+                        cpu: document.getElementById('ap-cpu').value.trim(),
+                        ram: document.getElementById('ap-ram').value.trim(),
+                        storage: document.getElementById('ap-storage').value.trim(),
+                        price: Number(document.getElementById('ap-price').value.trim() || 0),
+                        score: Number(document.getElementById('ap-score').value.trim() || 75),
+                        image: document.getElementById('ap-image').value.trim(),
+                        recommended: false
+                    };
+                    if (!data.title || !data.cpu) { alert('Judul & CPU diperlukan.'); return; }
+                    if (window.addProductFromForm) window.addProductFromForm(data);
+                    // clear form
+                    ['ap-title','ap-cpu','ap-ram','ap-storage','ap-price','ap-score','ap-image'].forEach(id=>document.getElementById(id).value='');
+                    form.style.display = 'none';
+                    alert('Produk disimpan (demo).');
+                });
+            }
+        });
+    </script>
+</body>
+</html>

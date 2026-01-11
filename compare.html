@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>COMPARE</title>
+    <link rel="stylesheet" href="style.css"> 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="scripts.js"></script>
+    
+    <style>
+        .catalog-section { padding: 40px 20px; }
+        .compare-section { 
+            background: rgba(0,0,0,0.2); 
+            padding: 50px 20px; 
+            margin-top: 50px;
+            border-top: 2px solid #ffd700;
+        }
+        .spec-list { list-style: none; padding: 0; margin: 8px 0 0 0; text-align: left; }
+        .spec-list li { padding: 6px 8px; border-radius: 8px; background: #fff; color:#222; margin-bottom:6px; box-shadow: 0 6px 18px rgba(0,0,0,0.05); }
+        .product { color: #333; background: white; }
+        .spec { border-bottom: 1px solid #eee; padding: 8px 0; display: flex; justify-content: space-between;}
+        .admin-panel { text-align: center; margin-bottom: 18px; }
+        .admin-panel .add-form { max-width: 920px; margin: 12px auto 0 auto; text-align: left; display: none; padding: 14px; border-radius: 12px; background: rgba(255,255,255,0.03); }
+        .admin-panel .add-form .row { display:flex; gap:12px; }
+        .admin-panel label { display:block; margin-bottom:6px; color:#fff; font-weight:600; }
+        .admin-panel input, .admin-panel select, .admin-panel textarea { width:100%; padding:10px; border-radius:8px; border:1px solid rgba(255,255,255,0.06); background: rgba(0,0,0,0.12); color:#fff; }
+        /* compare helpers */
+        .compare-controls { display:flex; gap:8px; align-items:center; }
+        .diff-row { background: linear-gradient(90deg, #fff7e6, #fff); }
+        /* when only-diff class is set on table, hide equal rows */
+        table.only-diff tbody tr.equal { display:none; }
+        /* layout: cards on top (horizontal), table below */
+        .compare-grid { display:flex; flex-direction:column; gap:20px; align-items:stretch; }
+        .compare-cards { display:flex; gap:16px; flex-wrap:nowrap; align-items:flex-start; justify-content:flex-start; }
+        .compare-cards .product { flex: 1 1 260px; box-sizing:border-box; padding:12px; border-radius:8px; box-shadow:0 8px 18px rgba(0,0,0,0.08); background:#fff }
+        .compare-table-wrapper { width:100%; }
+        .compare-section .card img { max-width:100%; height:auto }
+        .styled-compare-table { width:100%; border-collapse:collapse; background:#fff; color:#222; border-radius:8px; overflow:hidden; }
+        .styled-compare-table thead th, .styled-compare-table tbody td { padding:12px; border-left:1px solid #eee; text-align:center; }
+        .styled-compare-table thead th:first-child, .styled-compare-table tbody td:first-child { text-align:left; border-left:0; }
+        .styled-compare-table thead th { background:#fafafa; font-weight:700; }
+        .styled-compare-table tbody tr.equal td { background:transparent }
+        .styled-compare-table tbody tr.diff td:first-child { background:#fff7f0 }
+
+        @media (max-width:900px){
+            .compare-grid{ flex-direction:column }
+            .compare-cards{ width:100%; max-width:100%; order:2 }
+            .compare-table-wrapper{ order:1 }
+            .rec-grid{ flex-direction:column }
+            .rec-card{ width:100% }
+        }
+        /* recommendation card */
+        .recommendation-card { background: linear-gradient(180deg,#111 0%, #0b0b0b 100%); color: #fff; padding:18px; border-radius:12px; box-shadow: 0 10px 30px rgba(0,0,0,0.6); margin-top:18px; }
+        .recommendation-card h3 { margin:0 0 6px 0; color:#ffd700; }
+        .rec-grid { display:flex; gap:14px; align-items:flex-start; flex-wrap:wrap; }
+        .rec-card { background:#fff;color:#111;border-radius:10px;padding:10px;width:220px;box-shadow:0 8px 18px rgba(0,0,0,0.12); }
+        .rec-card img { width:100%;height:120px;object-fit:cover;border-radius:6px;margin-bottom:8px }
+        .badge { display:inline-block;padding:4px 8px;border-radius:999px;background:#ffd700;color:#111;font-weight:700;margin-right:6px;font-size:13px }
+        .pros-cons { display:flex;gap:12px;margin-top:12px }
+        .pros-cons ul { list-style:disc;padding-left:18px;margin:6px 0 }
+        .rec-cta { margin-top:12px; display:flex; gap:8px; }
+        .rec-cta .button { padding:8px 12px; border-radius:8px }
+    </style>
+
+    <script>
+        // small helper to escape HTML when building dynamic strings
+        function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"}[c]; }); }
+        const laptops = [
+            { id: 1, name: "Acer Aspire 5", img: "https://tse2.mm.bing.net/th/id/OIP.hxI2piQX28sIYTeaEwD4DwHaEn?pid=Api&h=220&P=0", cpu: "Intel i5", ram: "8GB", storage: "512GB SSD", harga: "Rp 8.000.000", display: "15.6\" FHD", battery: "48Wh", weight: "1.8kg" },
+            { id: 2, name: "Asus VivoBook", img: "https://tse3.mm.bing.net/th/id/OIP.APeEC-rwhBAAZuH4SaXh0QHaE2?pid=Api&h=220&P=0", cpu: "AMD Ryzen 5", ram: "16GB", storage: "1TB SSD", harga: "Rp 10.000.000", display: "14\" FHD", battery: "50Wh", weight: "1.6kg" },
+            { id: 3, name: "Lenovo ThinkPad", img: "https://www.notebookcheck.net/fileadmin/Notebooks/Lenovo/ThinkPad_X1_Carbon_2017-20HQS03P00_/teaser_4_3.JPG", cpu: "Intel i7", ram: "16GB", storage: "512GB SSD", harga: "Rp 12.000.000", display: "14\" FHD", battery: "57Wh", weight: "1.1kg" },
+            { id: 4, name: "HP Pavilion", img: "https://www.notebookcheck.net/fileadmin/Notebooks/HP/Pavilion_15-cs0003ng/HP_Pavilion_15_cs0003ng_1.jpg", cpu: "Intel i5", ram: "12GB", storage: "512GB SSD", harga: "Rp 9.500.000", display: "15.6\" FHD", battery: "41Wh", weight: "1.75kg" },
+            { id: 5, name: "Dell Inspiron", img: "https://laptopmedia.com/wp-content/uploads/2023/09/4-26-scaled-e1695980959438.jpg", cpu: "AMD Ryzen 7", ram: "16GB", storage: "1TB SSD", harga: "Rp 11.000.000", display: "15.6\" FHD", battery: "56Wh", weight: "1.9kg" },
+            { id: 6, name: "MSI Modern", img: "https://pisces.bbystatic.com/image2/BestBuy_US/images/products/6427/6427572cv1d.jpg", cpu: "Intel i7", ram: "16GB", storage: "512GB SSD", harga: "Rp 13.000.000", display: "14\" FHD", battery: "52Wh", weight: "1.3kg" },
+            { id: 7, name: "Huawei MateBook D", img: "https://i0.wp.com/www.amd-id.com/wp-content/uploads/2020/05/Kesimpulan-Huawei-MateBook-D14.jpg?resize=696%2C347&ssl=1", cpu: "AMD Ryzen 5", ram: "8GB", storage: "512GB SSD", harga: "Rp 9.000.000", display: "14\" FHD", battery: "56Wh", weight: "1.38kg" },
+            { id: 8, name: "Microsoft Surface Laptop", img: "https://images-cdn.ubuy.co.id/6679573e3c46b622b13af1e0-microsoft-surface-laptop-go-12-4.jpg", cpu: "Intel i5", ram: "8GB", storage: "256GB SSD", harga: "Rp 11.500.000", display: "13.5\" PixelSense", battery: "39Wh", weight: "1.25kg" },
+            { id: 9, name: "Apple MacBook Air (M1)", img: "https://i.ebayimg.com/00/s/MTE0MFgxMTQw/z/6ZsAAOSwUtJm9T0O/$_57.JPG?set_id=880000500F", cpu: "Apple M1", ram: "8GB", storage: "256GB SSD", harga: "Rp 14.000.000", display: "13.3\" Retina", battery: "49.9Wh", weight: "1.29kg" },
+            { id: 10, name: "Razer Blade Stealth", img: "https://blossomzones.com/wp-content/uploads/2019/07/BLADE-STEALTH-13.jpg", cpu: "Intel i7", ram: "16GB", storage: "512GB SSD", harga: "Rp 20.000.000", display: "13.3\" FHD", battery: "53Wh", weight: "1.4kg" },
+            { id: 11, name: "LG Gram", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQY6HIVFkNwtjs2t_s67TjJ7uR5GM_uVUShrg&s", cpu: "Intel i5", ram: "8GB", storage: "512GB SSD", harga: "Rp 13.500.000", display: "14\" FHD", battery: "72Wh", weight: "1.1kg" },
+            { id: 12, name: "Samsung Galaxy Book", img: "https://gizmologi.id/wp-content/uploads/2021/04/Samsung-Galaxy-Book-Pro-360-001.jpg", cpu: "Intel i7", ram: "16GB", storage: "512GB SSD", harga: "Rp 15.000.000", display: "15.6\" AMOLED", battery: "68Wh", weight: "1.45kg" }
+        ];
+
+        function renderAll() {
+            renderCatalog();
+            renderCompare();
+        }
+
+        // load extra laptops saved in localStorage (persist user additions)
+        (function loadExtras(){
+            try {
+                const extras = JSON.parse(localStorage.getItem('catalog_extra') || '[]');
+                if (Array.isArray(extras) && extras.length) {
+                    let maxId = Math.max(...laptops.map(l=>l.id));
+                    extras.forEach(ex => { maxId++; laptops.push(Object.assign({id: maxId}, ex)); });
+                }
+            } catch(e) { /* ignore */ }
+        })();
+
+        function renderCatalog() {
+            const grid = document.getElementById('laptop-grid');
+            grid.innerHTML = laptops.map(laptop => `
+                <div class="card">
+                    <img src="${laptop.img}" alt="${laptop.name}">
+                    <h3>${laptop.name}</h3>
+                    <p>${laptop.cpu} | ${laptop.ram}</p>
+                    <button onclick="addToCompare(${laptop.id})">Tambah ke Perbandingan</button>
+                </div>
+            `).join('');
+        }
+
+        function addToCompare(id) {
+            let selected = JSON.parse(localStorage.getItem('compare')) || [];
+            if (selected.includes(id)) return Swal.fire('Sudah ada!', '', 'info');
+            if (selected.length >= 3) return Swal.fire('Maksimal 3 laptop!', '', 'warning');
+            
+            selected.push(id);
+            localStorage.setItem('compare', JSON.stringify(selected));
+            renderCompare();
+            Swal.fire('Ditambahkan!', '', 'success');
+        }
+
+        function parsePrice(s) { return Number(String(s).replace(/[^0-9]/g, '')) || 0; }
+        function parseRam(s) { return Number(String(s).replace(/[^0-9]/g, '')) || 0; }
+
+        function renderCompare() {
+            const selectedIds = JSON.parse(localStorage.getItem('compare')) || [];
+            const container = document.getElementById('compare-container');
+            const recEl = document.getElementById('recommendation');
+
+            if (selectedIds.length === 0) {
+                container.innerHTML = "<p style='color:white'>Belum ada laptop yang dipilih untuk dibanding.</p>";
+                recEl.innerHTML = '';
+                return;
+            }
+
+            const selected = selectedIds.map(id => laptops.find(l => l.id === id)).filter(Boolean);
+
+            // cards with images
+            const cardsHtml = selected.map(laptop => {
+                // build spec list HTML from object keys (exclude id/img/harga/name)
+                const specKeys = ['display','cpu','ram','storage','battery','weight','harga'];
+                const specItems = specKeys.map(k => {
+                    if (!laptop[k]) return '';
+                    const label = k.toUpperCase();
+                    const val = laptop[k];
+                    return `<li><strong>${label}:</strong> ${val}</li>`;
+                }).filter(Boolean).join('');
+                return `
+                <div class="product">
+                    <img src="${laptop.img}" alt="${laptop.name}" style="width:100%;height:150px;object-fit:cover;border-radius:8px;margin-bottom:8px;">
+                    <h3 style="margin:6px 0">${laptop.name}</h3>
+                    <ul class="spec-list">${specItems}</ul>
+                    <div style="text-align:center;margin-top:8px;display:flex;gap:6px;justify-content:center;">
+                        <button class="hapus" onclick="removeFromCompare(${laptop.id})">Hapus</button>
+                    </div>
+                </div>
+            `;
+            }).join('');
+
+            // comparison table
+            const prices = selected.map(s => parsePrice(s.harga));
+            const rams = selected.map(s => parseRam(s.ram));
+            const minPrice = Math.min(...prices);
+            const maxRam = Math.max(...rams);
+
+            let table = '<div style="overflow:auto;margin-top:18px;"><table id="compare-table" class="styled-compare-table">';
+            // header row with names
+            table += '<thead><tr><th style="text-align:left;padding:10px;border-bottom:1px solid #eee"></th>' + selected.map(s => `<th style="padding:10px;border-left:1px solid #eee;text-align:center">${s.name}</th>`).join('') + '</tr></thead>';
+            table += '<tbody>';
+            const rows = [
+                { label: 'CPU', fn: s => s.cpu },
+                { label: 'RAM', fn: s => s.ram },
+                { label: 'Storage', fn: s => s.storage },
+                { label: 'Harga', fn: s => s.harga }
+            ];
+            rows.forEach(row => {
+                // compute values for this row and check if all equal
+                const vals = selected.map(s => (row.fn(s) || '').toString());
+                const allEqual = vals.every(v => v === vals[0]);
+                const rowClass = allEqual ? 'equal' : 'diff';
+                table += `<tr class="${rowClass}"><td style="padding:10px;border-top:1px solid #eee;font-weight:700;background:#fafafa">${row.label}</td>`;
+                selected.forEach((s, idx) => {
+                    let val = row.fn(s);
+                    let style = 'padding:10px;border-left:1px solid #eee;text-align:center;';
+                    if (row.label === 'Harga' && parsePrice(s.harga) === minPrice) style += 'background:linear-gradient(90deg, #eaffdf, #fff);border-left:1px solid rgba(0,0,0,0.04);';
+                    if (row.label === 'RAM' && parseRam(s.ram) === maxRam) style += 'background:linear-gradient(90deg, #fff7df, #fff);';
+                    // if this is price field, format via global formatter when available
+                    if (row.label === 'Harga') {
+                        const num = parsePrice(s.harga);
+                        val = (window.formatCurrency && typeof window.formatCurrency === 'function') ? window.formatCurrency(num) : ('Rp ' + num);
+                    }
+                    table += `<td style="${style}">${val}</td>`;
+                });
+                table += '</tr>';
+            });
+            table += '</tbody></table></div>';
+            // include a small toggle for showing only differences
+            const toggleHtml = `<div style="margin-top:10px;display:flex;justify-content:flex-end;align-items:center;gap:8px;"><label style="color:#fff;font-weight:600"><input id="show-diff-only" type="checkbox" style="margin-right:6px;">Tampilkan hanya perbedaan</label></div>`;
+
+            container.innerHTML = `
+                <div class="compare-grid">
+                    <div class="compare-cards">${cardsHtml}</div>
+                    <div class="compare-table-wrapper">${toggleHtml}${table}</div>
+                </div>
+            `;
+
+            // wire up toggle
+            const toggle = document.getElementById('show-diff-only');
+            const cmpTable = document.getElementById('compare-table');
+            if (toggle && cmpTable) {
+                toggle.addEventListener('change', ()=>{
+                    if (toggle.checked) cmpTable.classList.add('only-diff'); else cmpTable.classList.remove('only-diff');
+                });
+            }
+
+            // render recommendation after the compare cards
+            renderRecommendation(selectedIds);
+        }
+
+        // reorder helpers removed (user requested no left/right buttons)
+
+        function clearAllCompare() {
+            localStorage.setItem('compare', JSON.stringify([]));
+            renderCompare();
+        }
+
+        function exportCompareCSV() {
+            const selectedIds = JSON.parse(localStorage.getItem('compare')) || [];
+            if (!selectedIds.length) return Swal.fire('Tidak ada data untuk diekspor', '', 'info');
+            const rows = [];
+            rows.push(['Nama','Display','CPU','RAM','Storage','Battery','Weight','Harga']);
+            selectedIds.forEach(id=>{
+                const l = laptops.find(x=>x.id===id);
+                if (l) {
+                    const priceNum = parsePrice(l.harga);
+                    const priceFmt = (window.formatCurrency && typeof window.formatCurrency === 'function') ? window.formatCurrency(priceNum) : l.harga;
+                    rows.push([l.name, l.display || '', l.cpu || '', l.ram || '', l.storage || '', l.battery || '', l.weight || '', priceFmt]);
+                }
+            });
+            // normalize rows with new order (some old entries may lack fields)
+            for (let i=1;i<rows.length;i++){
+                const r = rows[i];
+                // if row currently has 5 columns (old format), map accordingly
+                if (r.length === 5) {
+                    const [name,cpu,ram,storage,harga] = r;
+                    rows[i] = [name, '', cpu, ram, storage, '', '', harga];
+                }
+                // if already full, keep as-is but ensure length
+                while(rows[i].length < 8) rows[i].splice(rows[i].length-1,0,'');
+            }
+            const csv = rows.map(r => r.map(cell=>`"${String(cell).replace(/"/g,'""')}"`).join(',')).join('\n');
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'compare.csv';
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            URL.revokeObjectURL(url);
+        }
+
+        function renderRecommendation(selectedIds) {
+            const recEl = document.getElementById('recommendation');
+            if (!selectedIds || selectedIds.length === 0) { recEl.innerHTML = ''; return; }
+
+            const selected = selectedIds.map(id => laptops.find(l => l.id === id)).filter(Boolean);
+
+                const parsePrice = s => Number(String(s).replace(/[^0-9]/g, '')) || 0;
+                const parseRam = s => Number(String(s).replace(/[^0-9]/g, '')) || 0;
+                const parseStorageGB = s => {
+                    const str = String(s).toUpperCase();
+                    const n = Number(str.replace(/[^0-9]/g,'') || 0);
+                    if (str.includes('TB')) return n * 1000;
+                    return n;
+                };
+
+                const prices = selected.map(s => parsePrice(s.harga));
+                const maxPrice = Math.max(...prices);
+
+                const scored = selected.map(s => {
+                    let cpuScore = 10;
+                    const cpu = s.cpu || '';
+                    if (/i9|RYZEN 9/i.test(cpu)) cpuScore = 40;
+                    else if (/i7|RYZEN 7/i.test(cpu)) cpuScore = 30;
+                    else if (/i5|RYZEN 5/i.test(cpu)) cpuScore = 20;
+
+                    const ramGB = parseRam(s.ram);
+                    const ramScore = Math.min(ramGB / 32, 1) * 25;
+
+                    const storageGB = parseStorageGB(s.storage);
+                    const storageScore = Math.min(storageGB / 1000, 1) * 10;
+
+                    const price = parsePrice(s.harga);
+                    const priceScore = maxPrice > 0 ? ((maxPrice - price) / maxPrice) * 25 : 0;
+
+                    const total = cpuScore + ramScore + storageScore + priceScore;
+                    return { s, total, cpuScore, ramScore, storageScore, priceScore };
+                });
+
+                scored.sort((a,b) => b.total - a.total);
+                const best = scored[0];
+                const cheapest = scored.reduce((p,c) => (parsePrice(c.s.harga) < parsePrice(p.s.harga) ? c : p), scored[0]);
+
+                // build a richer recommendation card
+                const regionFmt = (n) => (window.formatCurrency ? window.formatCurrency(n) : ('Rp ' + n));
+                const buildSpecList = (item) => {
+                    const parts = [];
+                    if (item.display) parts.push(item.display);
+                    if (item.cpu) parts.push(item.cpu);
+                    if (item.ram) parts.push(item.ram);
+                    if (item.storage) parts.push(item.storage);
+                    if (item.battery) parts.push(item.battery);
+                    return parts.join(' · ');
+                };
+
+                const bestHtml = `
+                    <div class="recommendation-card">
+                        <h3>Rekomendasi Pintar</h3>
+                        <div class="rec-grid">
+                            <div style="flex:1;min-width:260px;">
+                                <div style="display:flex;gap:12px;align-items:flex-start;">
+                                    <div style="flex:0 0 140px">
+                                        <div class="rec-card">
+                                            <img src="${best.s.img || best.s.image || ''}" alt="${best.s.name}">
+                                            <h4 style="margin:4px 0">${best.s.name}</h4>
+                                            <div style="font-size:13px;color:#444">${escapeHtml(buildSpecList(best.s))}</div>
+                                            <div style="margin-top:8px;font-weight:700">${regionFmt(parsePrice(best.s.harga))}</div>
+                                        </div>
+                                    </div>
+                                    <div style="flex:1">
+                                        <div style="margin-bottom:6px;"><span class="badge">Pilihan Terbaik</span> <strong style="font-size:16px">${best.s.name}</strong></div>
+                                        <p style="margin:6px 0;color:#ddd;line-height:1.4">${escapeHtml(best.s.name)} tampil menonjol berdasarkan kombinasi CPU, RAM, penyimpanan, dan harga — cocok untuk pengguna yang butuh keseimbangan performa dan nilai.</p>
+                                        <div style="margin-top:8px;font-size:14px;color:#fff7d9">Skor komposit: <strong style="color:#ffd700">${Math.round(best.total)}</strong> (CPU ${Math.round(best.cpuScore)}, RAM ${Math.round(best.ramScore)}, Storage ${Math.round(best.storageScore)}, Harga ${Math.round(best.priceScore)})</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="flex:0 0 280px;">
+                                <div style="background:rgba(255,255,255,0.04);padding:10px;border-radius:8px">
+                                    <h4 style="margin:6px 0;color:#ffd700">Ringkasan</h4>
+                                    <div class="pros-cons">
+                                        <div style="flex:1">
+                                            <strong style="color:#bfffcf">Kelebihan</strong>
+                                            <ul>
+                                                <li>Performa kuat untuk multitasking.</li>
+                                                <li>CPU & RAM seimbang untuk produktivitas.</li>
+                                                <li>Rasio harga vs performa baik.</li>
+                                            </ul>
+                                        </div>
+                                        <div style="flex:1">
+                                            <strong style="color:#ffd1d1">Kekurangan</strong>
+                                            <ul>
+                                                <li>Harga lebih tinggi daripada opsi paling murah.</li>
+                                                <li>Jika butuh portabilitas ekstrem, perhatikan berat.</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <div class="rec-cta">
+                                        <button class="button" onclick="exportCompareCSV()">Ekspor CSV</button>
+                                        <button class="button" onclick="clearAllCompare()" style="background:transparent;border:1px solid #ffd700;color:#ffd700">Bersihkan</button>
+                                        <a href="index.html" class="button" style="background:#2b6cff;color:#fff">Cari Lagi</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                recEl.innerHTML = bestHtml;
+        }
+
+        function removeFromCompare(id) {
+            let selected = JSON.parse(localStorage.getItem('compare')) || [];
+            selected = selected.filter(i => i !== id);
+            localStorage.setItem('compare', JSON.stringify(selected));
+            renderCompare();
+        }
+
+        window.onload = renderAll;
+    </script>
+    <script>
+        // admin form behavior: toggle and add laptop
+        document.addEventListener('DOMContentLoaded', () => {
+            const toggle = document.getElementById('toggle-add');
+            const form = document.getElementById('add-form');
+            const addBtn = document.getElementById('add-laptop');
+
+            if (toggle && form) {
+                toggle.addEventListener('click', () => { form.style.display = form.style.display === 'none' || form.style.display === '' ? 'block' : 'none'; });
+            }
+
+            if (addBtn) {
+                addBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const name = document.getElementById('new-name').value.trim();
+                    const cpu = document.getElementById('new-cpu').value.trim();
+                    const ram = document.getElementById('new-ram').value.trim();
+                    const storage = document.getElementById('new-storage').value.trim();
+                    const harga = document.getElementById('new-price').value.trim();
+                    const img = document.getElementById('new-img').value.trim() || '';
+                    const display = document.getElementById('new-display') ? document.getElementById('new-display').value.trim() : '';
+                    const battery = document.getElementById('new-battery') ? document.getElementById('new-battery').value.trim() : '';
+                    const weight = document.getElementById('new-weight') ? document.getElementById('new-weight').value.trim() : '';
+
+                    if (!name || !cpu) return Swal.fire('Nama & CPU diperlukan', '', 'warning');
+
+                    // assign new id
+                    const maxId = Math.max(...laptops.map(l=>l.id));
+                    const newId = (isFinite(maxId) ? maxId : 0) + 1;
+                    const newItem = { id: newId, name, img, cpu, ram: ram || '-', storage: storage || '-', harga: harga || '-', display: display || '-', battery: battery || '-', weight: weight || '-' };
+                    laptops.push(newItem);
+
+                    // persist minimal data (without id) so future loads can reassign ids
+                    try {
+                        const extras = JSON.parse(localStorage.getItem('catalog_extra') || '[]');
+                        extras.push({ name, img, cpu, ram: ram || '-', storage: storage || '-', harga: harga || '-', display: display || '-', battery: battery || '-', weight: weight || '-' });
+                        localStorage.setItem('catalog_extra', JSON.stringify(extras));
+                    } catch(e) {}
+
+                    renderCatalog();
+                    Swal.fire('Berhasil', 'Laptop ditambahkan ke katalog.', 'success');
+                    // clear form
+                    ['new-name','new-cpu','new-ram','new-storage','new-price','new-img','new-display','new-battery','new-weight'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+                });
+            }
+        });
+            // attach export / clear handlers
+            document.addEventListener('DOMContentLoaded', ()=>{
+                const exportBtn = document.getElementById('export-csv');
+                const clearBtn = document.getElementById('clear-all');
+                if (exportBtn) exportBtn.addEventListener('click', ()=> exportCompareCSV());
+                if (clearBtn) clearBtn.addEventListener('click', ()=> {
+                    Swal.fire({ title: 'Yakin?', text: 'Hapus semua pilihan perbandingan?', icon: 'warning', showCancelButton:true }).then(r=>{ if (r.isConfirmed) clearAllCompare(); });
+                });
+            });
+    </script>
+</head>
+<body>
+    <header>
+        <div class="brand">
+            <img src="logo.png" alt="Logo" class="logo">
+            <h1>Check & Compare</h1>
+        </div>
+        <nav>
+            <a href="index.html">Back to Home</a>
+            <a href="contact.html" class="button contact-btn">Contact Us</a>
+        </nav>
+    </header>
+
+    <div class="catalog-section">
+        <h2 style="text-align: center;">Pilih Laptop Yang Mau Dibandingkan</h2>
+
+        <div class="admin-panel">
+            <button id="toggle-add" class="button">Tambah Laptop Baru</button>
+            <div class="add-form" id="add-form">
+                <div style="display:flex;gap:12px;flex-wrap:wrap;">
+                    <div style="flex:1;min-width:200px;">
+                        <label for="new-name">Nama</label>
+                        <input id="new-name" type="text" placeholder="Nama laptop">
+                    </div>
+                    <div style="flex:1;min-width:200px;">
+                        <label for="new-cpu">CPU</label>
+                        <input id="new-cpu" type="text" placeholder="contoh: Intel i5">
+                    </div>
+                    <div style="flex:1;min-width:200px;">
+                        <label for="new-ram">RAM</label>
+                        <input id="new-ram" type="text" placeholder="contoh: 8GB">
+                    </div>
+                </div>
+                    <div style="display:flex;gap:12px;margin-top:10px;flex-wrap:wrap;">
+                    <div style="flex:1;min-width:200px;">
+                        <label for="new-storage">Storage</label>
+                        <input id="new-storage" type="text" placeholder="contoh: 512GB SSD">
+                    </div>
+                    <div style="flex:1;min-width:200px;">
+                        <label for="new-price">Harga</label>
+                        <input id="new-price" type="text" placeholder="contoh: Rp 9.000.000">
+                    </div>
+                        <div style="flex:1;min-width:200px;">
+                            <label for="new-img">URL Foto (opsional)</label>
+                            <input id="new-img" type="text" placeholder="https://...">
+                        </div>
+                    </div>
+                    <div style="display:flex;gap:12px;margin-top:10px;flex-wrap:wrap;">
+                        <div style="flex:1;min-width:160px;"><label for="new-display">Layar</label><input id="new-display" type="text" placeholder="contoh: 15.6\" FHD"></div>
+                        <div style="flex:1;min-width:160px;"><label for="new-battery">Baterai</label><input id="new-battery" type="text" placeholder="contoh: 50Wh"></div>
+                        <div style="flex:1;min-width:160px;"><label for="new-weight">Berat</label><input id="new-weight" type="text" placeholder="contoh: 1.5kg"></div>
+                </div>
+                <div style="text-align:right;margin-top:12px;">
+                    <button id="add-laptop" class="button">Tambahkan</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid" id="laptop-grid"></div>
+    </div>
+
+    <div class="compare-section" id="compare-section">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
+            <h2 style="text-align: left; color: #ffd700; margin:0;">Hasil Perbandingan</h2>
+            <div style="display:flex;gap:8px;align-items:center;">
+                <button id="export-csv" class="button">Ekspor CSV</button>
+                <button id="clear-all" class="button" style="background:transparent;border:1px solid #ffd700;color:#ffd700;">Bersihkan Semua</button>
+            </div>
+        </div>
+        <div class="compare-container" id="compare-container"></div>
+        <div id="recommendation" class="recommendation"></div>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 TIM SENANDIKA : <a href="https://itpln.ac.id/" target="_blank" rel="noopener">ITPLN</a></p>
+    </footer>
+</body>
+</html>

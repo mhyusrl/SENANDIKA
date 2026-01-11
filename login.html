@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>LOGIN</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        .form-container {
+            max-width: 400px;
+            margin: 80px auto;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+        input { width: 100%; padding: 12px; margin-bottom: 20px; border-radius: 10px; border: none; }
+        h2 { text-align: center; color: #ffd700; margin-bottom: 30px; }
+        label { color: white; display: block; margin-bottom: 8px; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Login</h1>
+        <nav><a href="index.html">Beranda</a> | <a href="register.html">Register</a></nav>
+    </header>
+
+    <div class="form-container">
+        <h2>Selamat Datang Kembali</h2>
+        <form onsubmit="handleLogin(event)">
+            <label>Email</label>
+            <input type="email" id="loginEmail" required placeholder="Masukkan email...">
+            
+            <label>Password</label>
+            <input type="password" id="loginPass" required placeholder="Masukkan password...">
+            
+            <button type="submit" style="width: 100%;">Masuk</button>
+        </form>
+        <p style="text-align: center; color: white; margin-top: 20px;">
+            Belum punya akun? <a href="register.html" style="color: #ffd700;">Daftar disini</a>
+        </p>
+    </div>
+
+    <script>
+        function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const pass = document.getElementById('loginPass').value;
+
+            // Cek data di LocalStorage
+            const storedUser = JSON.parse(localStorage.getItem('user_' + email));
+
+            if (storedUser && storedUser.password === pass) {
+                // Simpan sesi login
+                localStorage.setItem('isLoggedIn', 'true');
+                localStorage.setItem('currentUser', storedUser.name);
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Login Berhasil!',
+                    text: 'Selamat datang, ' + storedUser.name,
+                    timer: 2000,
+                    showConfirmButton: false
+                }).then(() => {
+                    window.location.href = 'compare.html';
+                });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal!',
+                    text: 'Email atau password salah.',
+                });
+            }
+        }
+    </script>
+</body>
+</html>

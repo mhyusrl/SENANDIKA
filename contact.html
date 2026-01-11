@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>CONTACT</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <style>
+        .contact-wrap { max-width:900px; margin:36px auto; padding:28px; background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01)); border-radius:14px; box-shadow: var(--shadow); }
+        form .field { margin-bottom:14px; text-align:left; }
+        label { display:block; margin-bottom:6px; color:rgba(255,255,255,0.9); font-weight:600; }
+        input[type="text"], input[type="email"], textarea, select { width:100%; padding:12px 14px; border-radius:10px; border:1px solid rgba(255,255,255,0.06); background: rgba(0,0,0,0.14); color: #fff; font-size:1em; }
+        textarea { min-height:140px; resize:vertical; }
+        .row { display:flex; gap:12px; }
+        .row .col { flex:1; }
+        .muted { font-size:0.9em; color:rgba(255,255,255,0.75); }
+        .note { margin-top:10px; font-size:0.92em; color:rgba(255,255,255,0.8); }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="brand">
+            <img src="logo.png" alt="Logo" class="logo">
+            <h1>Contact</h1>
+        </div>
+        <nav>
+            <a href="index.html">Home</a> | <a href="compare.html">Compare</a>
+        </nav>
+    </header>
+
+    <main class="section">
+        <div class="contact-wrap">
+            <h2 style="color:#ffd700; margin-top:0">Contact Us</h2>
+            <p class="muted">Isi form berikut untuk mengirim pesan atau saran kepada tim pengembang SPECLAP. Kami akan merespons secepatnya.</p>
+
+            <form id="contact-form">
+                <div class="row">
+                    <div class="col field">
+                        <label for="name">Nama lengkap</label>
+                        <input id="name" name="name" type="text" placeholder="Nama Anda" required>
+                    </div>
+                    <div class="col field">
+                        <label for="email">Email</label>
+                        <input id="email" name="email" type="email" placeholder="name@example.com" required>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col field">
+                        <label for="phone">Nomor Telepon</label>
+                        <input id="phone" name="phone" type="text" placeholder="08xxxxxxxxxx">
+                    </div>
+                    <div class="col field">
+                        <label for="education">Jenjang Pendidikan</label>
+                        <select id="education" name="education">
+                            <option value="">-- Pilih --</option>
+                            <option>SMK/SMA</option>
+                            <option>Diploma</option>
+                            <option>S1 (Sarjana)</option>
+                            <option>S2 (Magister)</option>
+                            <option>S3 (Doktor)</option>
+                            <option>Lainnya</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label for="message">Pesan</label>
+                    <textarea id="message" name="message" placeholder="Tulis pesan atau saran Anda di sini..." required></textarea>
+                </div>
+
+                <div style="text-align:right;">
+                    <button type="submit" class="button">SUBMIT</button>
+                </div>
+
+                <p class="note">Dengan mengirim, pesan akan disalin ke browser Anda dan membuka aplikasi email untuk dikirim (atau simpan di localStorage).</p>
+            </form>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 SPECLAP — <a href="https://itpln.ac.id/" target="_blank" rel="noopener">ITPLN</a></p>
+    </footer>
+
+    <script src="scripts.js"></script>
+
+    <script>
+        const form = document.getElementById('contact-form');
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const name = document.getElementById('name').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const education = document.getElementById('education').value;
+            const message = document.getElementById('message').value.trim();
+
+            if (!name || !email || !message) {
+                return Swal.fire('Lengkapi form', 'Nama, email, dan pesan wajib diisi.', 'warning');
+            }
+            const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRe.test(email)) return Swal.fire('Email tidak valid', 'Masukkan alamat email yang benar.', 'error');
+
+            // save to localStorage (so developer can check later)
+            try {
+                const list = JSON.parse(localStorage.getItem('contacts') || '[]');
+                list.push({ name, email, phone, education, message, date: new Date().toISOString() });
+                localStorage.setItem('contacts', JSON.stringify(list));
+            } catch (err) { /* ignore storage errors */ }
+
+            // build mailto (opens user's email client)
+            const subject = `Pesan dari SPECLAP: ${name}`;
+            const body = `Nama: ${name}\nEmail: ${email}\nTelepon: ${phone}\nJenjang: ${education}\n\nPesan:\n${message}`;
+            const mailto = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+
+            // show success then open mailto
+            Swal.fire({ title: 'Siap dikirim', text: 'Aplikasi email Anda akan terbuka untuk mengirim pesan (atau pesan disimpan di browser).', icon: 'success', showConfirmButton: true }).then(() => {
+                window.location.href = mailto;
+                form.reset();
+            });
+        });
+    </script>
+</body>
+</html>

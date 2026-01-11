@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>LAPTOP DETAILS</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .detail { max-width: 600px; margin: auto; }
+    </style>
+</head>
+<body>
+    <div class="detail">
+        <div id="search-result" style="margin-bottom:10px;"></div>
+        <div style="max-width:900px;margin:8px auto 18px auto;display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:center;">
+            <input id="filter-keyword" placeholder="Cari kata kunci..." style="padding:8px;border-radius:8px;border:1px solid rgba(0,0,0,0.12);min-width:180px;">
+            <input id="min-price" type="number" placeholder="Min harga" style="padding:8px;border-radius:8px;border:1px solid rgba(0,0,0,0.12);width:120px;">
+            <input id="max-price" type="number" placeholder="Max harga" style="padding:8px;border-radius:8px;border:1px solid rgba(0,0,0,0.12);width:120px;">
+            <input id="min-weight" type="number" step="0.01" placeholder="Min berat (kg)" style="padding:8px;border-radius:8px;border:1px solid rgba(0,0,0,0.12);width:140px;">
+            <input id="max-weight" type="number" step="0.01" placeholder="Max berat (kg)" style="padding:8px;border-radius:8px;border:1px solid rgba(0,0,0,0.12);width:140px;">
+            <input id="min-battery" type="number" placeholder="Min baterai (mAh)" style="padding:8px;border-radius:8px;border:1px solid rgba(0,0,0,0.12);width:140px;">
+            <input id="max-battery" type="number" placeholder="Max baterai (mAh)" style="padding:8px;border-radius:8px;border:1px solid rgba(0,0,0,0.12);width:140px;">
+            <select id="sort-select" style="padding:8px;border-radius:8px;border:1px solid rgba(0,0,0,0.12);">
+                <option value="">Urutkan</option>
+                <option value="price-asc">Harga: Terendah</option>
+                <option value="price-desc">Harga: Tertinggi</option>
+                <option value="score-desc">Skor: Tertinggi</option>
+            </select>
+            <button id="apply-filters" class="button">Terapkan</button>
+            <button id="reset-filters" class="button" style="background:transparent;border:1px solid #ffd700;color:#ffd700;">Reset</button>
+        </div>
+        <div id="product-list" class="grid"></div>
+        <div id="product-detail" style="max-width:900px; margin:20px auto; text-align:left;"></div>
+    </div>
+    <a href="index.html">Kembali</a>
+    <script src="scripts.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', ()=>{
+            const apply = document.getElementById('apply-filters');
+            const reset = document.getElementById('reset-filters');
+            if (apply) apply.addEventListener('click', ()=>{ if (window.refreshAll) window.refreshAll(); });
+            if (reset) reset.addEventListener('click', ()=>{
+                ['filter-keyword','min-price','max-price','min-weight','max-weight','min-battery','max-battery','sort-select'].forEach(id=>{ const el=document.getElementById(id); if(el)el.value=''; });
+                if (window.refreshAll) window.refreshAll();
+            });
+        });
+    </script>
+</body>
+</html>
